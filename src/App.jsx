@@ -1,122 +1,86 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Home, Wallet, ReceiptText, Landmark, UserCircle, CreditCard } from 'lucide-react';
 
-function App() {
-  const [count, setCount] = useState(0)
+import Dashboard from './pages/Dashboard';
+import Budget from './pages/Budget';
+import Expense from './pages/Expense';
+import Debt from './pages/Debt';
+import WalletPage from './pages/Wallet'; // Import halaman baru
+
+function BottomNav() {
+  const location = useLocation();
+  const navItems = [
+    { path: '/', label: 'Home', icon: <Home size={22} /> },
+    { path: '/wallet', label: 'Dompet', icon: <CreditCard size={22} /> },
+    { path: '/budget', label: 'Budget', icon: <Wallet size={22} /> },
+    { path: '/expense', label: 'Catat', icon: <ReceiptText size={22} /> },
+    { path: '/debt', label: 'Cicilan', icon: <Landmark size={22} /> },
+  ];
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto bg-white/90 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-3xl flex justify-around p-2 z-50 border border-gray-100">
+      {navItems.map((item) => {
+        const isActive = location.pathname === item.path;
+        return (
+          <Link 
+            key={item.path} 
+            to={item.path} 
+            className={`flex flex-col items-center p-2 rounded-2xl transition-all duration-300 ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}
+          >
+            {item.icon}
+            <span className={`text-[9px] mt-1 ${isActive ? 'font-bold' : 'font-medium'}`}>{item.label}</span>
+          </Link>
+        );
+      })}
+    </div>
+  );
 }
 
-export default App
+export default function App() {
+  const [profile, setProfile] = useState(() => localStorage.getItem('activeProfile') || 'Suami');
+
+  useEffect(() => {
+    localStorage.setItem('activeProfile', profile);
+  }, [profile]);
+
+  return (
+    <Router>
+      <div className="min-h-screen bg-slate-50 flex justify-center font-sans">
+        <div className="w-full max-w-md bg-slate-50 min-h-screen relative pb-28">
+          
+          <header className="bg-slate-50 pt-6 pb-4 px-6 sticky top-0 z-10 flex justify-between items-center">
+            <div>
+              <h1 className="font-extrabold text-2xl text-slate-800 tracking-tight">FamFund.</h1>
+              <p className="text-xs text-slate-500 font-medium">Satu dompet, untuk berdua.</p>
+            </div>
+            
+            <div className="relative">
+              <select 
+                value={profile} 
+                onChange={(e) => setProfile(e.target.value)}
+                className="appearance-none bg-white border border-slate-200 shadow-sm text-indigo-700 pl-9 pr-4 py-2 rounded-full font-bold text-sm outline-none cursor-pointer focus:ring-2 focus:ring-indigo-100 transition-all"
+              >
+                <option value="Suami">Suami</option>
+                <option value="Istri">Istri</option>
+              </select>
+              <UserCircle className="absolute left-2.5 top-2 text-indigo-500" size={18} />
+            </div>
+          </header>
+
+          <main className="px-6">
+            <Routes>
+              <Route path="/" element={<Dashboard activeProfile={profile} />} />
+              <Route path="/wallet" element={<WalletPage activeProfile={profile} />} />
+              <Route path="/budget" element={<Budget activeProfile={profile} />} />
+              <Route path="/expense" element={<Expense activeProfile={profile} />} />
+              <Route path="/debt" element={<Debt activeProfile={profile} />} />
+            </Routes>
+          </main>
+
+          <BottomNav />
+        </div>
+      </div>
+    </Router>
+  );
+}
