@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Menyembunyikan Netlify Toolbar yang menutupi navigasi */
+netlify-toolbar, #netlify-toolbar {
+  display: none !important;
+}
